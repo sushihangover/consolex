@@ -9,7 +9,7 @@ namespace ConsoleX
 {
     public class MainConsole : IDisposable
     {
-        private Window currentWindow;
+        private CursesSharp.Window currentWindow;
         private Color currentColor;
 
         private static MainConsole instance = new MainConsole();
@@ -96,5 +96,14 @@ namespace ConsoleX
                 this.currentWindow.AttrOff(CursesSharp.Attrs.BOLD);
             }
         } }
+
+        public void SetCurrentWindow(Window window)
+        {
+            this.currentWindow = window;
+            window.Run();
+        }
+
+        public static readonly int HEIGHT = 25;
+        public static readonly int WIDTH = 80;
     }
 }
