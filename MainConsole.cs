@@ -103,7 +103,12 @@ namespace ConsoleX
             window.Run();
         }
 
-        public static readonly int HEIGHT = 25;
-        public static readonly int WIDTH = 80;
+        public static readonly int Height = 25;
+        public static readonly int Width = 80;
+
+        internal void Write(int x, int y, char p)
+        {
+            this.Write(x, y, p.ToString());
+        }
     }
 }
