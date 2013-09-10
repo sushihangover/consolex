@@ -13,8 +13,10 @@ namespace ConsoleX
         private Color currentColor;
 
         private static MainConsole instance = new MainConsole();
-
         public static MainConsole Instance { get { return instance; } }
+
+        public static readonly int Height = 25;
+        public static readonly int Width = 80;
 
         private MainConsole()
         {
@@ -54,10 +56,17 @@ namespace ConsoleX
         public void Refresh()
         {
             this.currentWindow.Refresh();
+        }        
+
+        public void Write(string text) {
+            text = this.ConvertUnixToWindowsNewlines(text);
+            this.currentWindow.Add(text);
         }
 
         public void Write(int x, int y, string text)
         {
+            text = this.ConvertUnixToWindowsNewlines(text);
+
             if (x == 79 && y == 24)
             {
                 // There's a bug in CursesSharp. This sucks down our performance, but, I dunno.
@@ -73,12 +82,23 @@ namespace ConsoleX
             }
             else
             {
-                // Black doesn't show
-                if (this.currentColor != Color.Black)
-                {
-                    this.currentWindow.Add(y, x, text);
-                }
+                this.currentWindow.Add(y, x, text);
             }
+        }
+
+        public void WriteLine(string text)
+        {
+            this.Write(string.Format("{0}\n", text));
+        }
+
+        public void Write(char c)
+        {
+            this.Write(c.ToString());
+        }
+
+        public void Write(int x, int y, char p)
+        {
+            this.Write(x, y, p.ToString());
         }
 
         public Color Color { set {
@@ -103,12 +123,24 @@ namespace ConsoleX
             window.Run();
         }
 
-        public static readonly int Height = 25;
-        public static readonly int Width = 80;
-
-        internal void Write(int x, int y, char p)
+        private string ConvertUnixToWindowsNewlines(string text)
         {
-            this.Write(x, y, p.ToString());
+            // On Windows, \r just goes to the beginning of the line. We want \n.
+            return text.Replace('\r', '\n');
+        }
+
+        // Backspace. Won' go beyond the current line.
+        public void Backspace()
+        {
+            int x = 0;
+            int y = 0;
+            this.currentWindow.GetCursorYX(out y, out x);
+            x -= 1;
+            if (x >= 0)
+            {
+                this.currentWindow.Add(y, x, " ");
+                this.currentWindow.Move(y, x);
+            }
         }
     }
 }
